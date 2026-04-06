@@ -125,3 +125,13 @@ def create_article():
             return "При добавлении статьи произошла ошибка!"
     else:
         return render_template("create-article.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+# 👇 ДОБАВЬТЕ ЭТОТ БЛОК В САМЫЙ КОНЕЦ ФАЙЛА
+# Он создаст таблицы при первом запуске на сервере
+with app.app_context():
+    db.create_all()
+    print("✅ Таблицы созданы (или уже существуют)")
