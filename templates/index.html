@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameReview — Честные обзоры видеоигр</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        /* Стили для популярных статей на главной */
+        .popular-articles {
+            background: #0a0c10;
+            padding: 60px 0;
+        }
+
+        .popular-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .popular-card {
+            background: #11141c;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #232734;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .popular-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff4d4d;
+        }
+
+        .popular-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .popular-rank {
+            background: #ff4d4d;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .popular-views {
+            color: #7c7f8c;
+            font-size: 14px;
+        }
+
+        .popular-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .popular-card h3 a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .popular-card h3 a:hover {
+            color: #ff4d4d;
+        }
+
+        .popular-card p {
+            color: #9ca3af;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .popular-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popular-score {
+            background: #ff4d4d;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .read-more-small {
+            color: #ff4d4d;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .read-more-small:hover {
+            text-decoration: underline;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 36px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff, #cbd5e6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-header p {
+            color: #9ca3af;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    🎮 <span>GameReview</span>
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="/" class="active">Главная</a>
+                <a href="/posts">Все обзоры</a>
+                <a href="/create-article">Написать обзор</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- Hero секция -->
+    <section class="hero">
+        <div class="container hero-container">
+            <div class="hero-text">
+                <h1>Честные обзоры<br>на игры, в которые стоит играть</h1>
+                <p>Разборы механик, сюжета, графики и вердикт — стоит ли брать. Только независимое мнение.</p>
+                <div class="hero-buttons">
+                    <a href="/posts" class="btn btn-primary">Смотреть обзоры</a>
+                    <a href="#about" class="btn btn-outline">Узнать больше</a>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat"><span>450+</span> обзоров</div>
+                <div class="stat"><span>98%</span> читателей рекомендуют</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Популярные статьи -->
+    {% if popular_articles %}
+    <section class="popular-articles">
+        <div class="container">
+            <div class="section-header">
+                <h2>🔥 Популярные обзоры</h2>
+                <p>Самые читаемые статьи этой недели</p>
+            </div>
+            <div class="popular-grid">
+                {% for article in popular_articles %}
+                <div class="popular-card">
+                    <div class="popular-card-header">
+                        <span class="popular-rank">#{{ loop.index }} по просмотрам</span>
+                        <span class="popular-views">👁️ {{ article.views if article.views else 0 }}</span>
+                    </div>
+                    <h3><a href="/posts/{{ article.id }}">{{ article.title }}</a></h3>
+                    <p>{{ article.intro[:100] }}{% if article.intro|length > 100 %}...{% endif %}</p>
+                    <div class="popular-card-footer">
+                        {% if article.score %}
+                        <span class="popular-score">⭐ {{ article.score }}/10</span>
+                        {% endif %}
+                        <a href="/posts/{{ article.id }}" class="read-more-small">Читать →</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Преимущества секция -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Почему выбирают нас?</h2>
+                <p>Мы делаем обзоры, которым можно доверять</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Честные оценки</h3>
+                    <p>Никакой предвзятости — только объективный анализ и реальные оценки от 0 до 10.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Детальные разборы</h3>
+                    <p>Мы разбираем игры по косточкам: сюжет, геймплей, графику, звук и оптимизацию.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Сообщество геймеров</h3>
+                    <p>Обсуждайте игры, делитесь мнениями и помогайте другим делать правильный выбор.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <a href="/">
+                        🎮 <span>GameReview</span>
+                    </a>
+                </div>
+                <p>Независимые обзоры видеоигр. Только факты, честные оценки и помощь в выборе.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/posts">Все обзоры</a></li>
+                    <li><a href="/create-article">Написать обзор</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Информация</h4>
+                <ul>
+                    <li><a href="#">О проекте</a></li>
+                    <li><a href="#">Связаться с редакцией</a></li>
+                    <li><a href="#">Политика конфиденциальности</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Подписка</h4>
+                <p>Будьте в курсе новых обзоров</p>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Ваш email" required>
+                    <button type="submit">→</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 GameReview. Все права защищены. Все товарные знаки являются собственностью их владельцев.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

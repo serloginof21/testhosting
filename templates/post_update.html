@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обновление статьи — GameReview</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/update.css') }}">
+    <style>
+        .score-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .score-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .score-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .score-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 10px 16px;
+            background: #1a1e2a;
+            border: 1px solid #2a2e3a;
+            border-radius: 40px;
+            color: #cbd5e6;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .score-option input:checked + .score-label {
+            background: #ff4d4d;
+            border-color: #ff4d4d;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .score-label:hover {
+            border-color: #ff4d4d;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    🎮 <span>GameReview</span>
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/posts">Все обзоры</a>
+                <a href="/create-article">Написать обзор</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="form-container">
+        <h1>✏️ Обновление статьи</h1>
+        <div class="article-info">
+            <p>📄 <strong>ID статьи:</strong> {{ article.id }} | <strong>Дата создания:</strong> {{ article.date.date() if article.date else "Не указана" }}</p>
+        </div>
+        <form method="post" class="form-card">
+            <div class="form-group">
+                <label class="form-label" for="title">Название статьи</label>
+                <input type="text" name="title" id="title" class="form-control" value="{{ article.title }}" required>
+            </div>
+
+            <!-- БЛОК ВЫБОРА ОЦЕНКИ -->
+            <div class="form-group">
+                <label class="form-label">⭐ Оценка игры (от 1 до 10)</label>
+                <div class="score-container">
+                    {% for i in range(1, 11) %}
+                    <label class="score-option">
+                        <input type="radio" name="score" value="{{ i }}" {% if article.score == i %}checked{% endif %} required>
+                        <span class="score-label">
+                            <span>{{ i }}</span>
+                            <span>/10</span>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="form-hint">Выберите оценку от 1 до 10</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="intro">Анонс</label>
+                <textarea name="intro" id="intro" class="form-control" rows="4" required>{{ article.intro }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="text">Основной текст</label>
+                <textarea name="text" id="text" class="form-control" rows="12" required>{{ article.text }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-update">🔄 Обновить статью</button>
+                <a href="/posts/{{ article.id }}" class="btn-cancel">❌ Отмена</a>
+                <a href="/posts/{{ article.id }}/delete" class="btn-delete-form" onclick="return confirm('Вы уверены?')">🗑️ Удалить</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">🎮 <span>GameReview</span></div>
+                <p>Независимые обзоры видеоигр.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/posts">Все обзоры</a></li>
+                    <li><a href="/create-article">Написать обзор</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Информация</h4>
+                <ul>
+                    <li><a href="#">Связаться</a></li>
+                    <li><a href="#">Политика</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Подписка</h4>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Ваш email">
+                    <button type="submit">→</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 GameReview</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все обзоры — GameReview</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
+    <style>
+        /* Дополнительные стили для сортировки и оценок */
+        .sort-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-bottom: 30px;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            background: #1a1e2a;
+            color: #cbd5e6;
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+            border: 1px solid #2a2e3a;
+        }
+
+        .sort-btn:hover {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+            transform: translateY(-2px);
+        }
+
+        .sort-btn.active {
+            background: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+        }
+
+        .review-score-badge {
+            display: inline-block;
+            background: #ff4d4d;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .review-views {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #1a1e2a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #cbd5e6;
+            margin-left: 8px;
+        }
+
+        /* Стили для поиска */
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+            background: #11141c;
+            border-radius: 60px;
+            padding: 6px;
+            border: 1px solid #232734;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 20px;
+            color: #eef2ff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #7c7f8c;
+        }
+
+        .search-btn {
+            background: #ff4d4d;
+            border: none;
+            padding: 0 28px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .search-btn:hover {
+            background: #e63e3e;
+            transform: translateY(-2px);
+        }
+
+        .search-results-info {
+            text-align: center;
+            margin-top: 16px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .search-results-info strong {
+            color: #ff4d4d;
+        }
+
+        .clear-search {
+            color: #ff4d4d;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .clear-search:hover {
+            text-decoration: underline;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: #11141c;
+            border-radius: 24px;
+            margin: 20px 0;
+        }
+
+        .no-results h3 {
+            color: #eef2ff;
+            margin-bottom: 12px;
+            font-size: 24px;
+        }
+
+        .no-results p {
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+
+        .no-results a {
+            color: #ff4d4d;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Адаптация для мобильных */
+        @media (max-width: 640px) {
+            .sort-bar {
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .search-form {
+                flex-direction: column;
+                background: transparent;
+                padding: 0;
+                gap: 10px;
+            }
+
+            .search-input {
+                background: #11141c;
+                border-radius: 50px;
+                border: 1px solid #232734;
+            }
+
+            .search-btn {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    🎮 <span>GameReview</span>
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/posts" class="active">Все обзоры</a>
+                <a href="/create-article">Создать пост</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="posts-hero">
+        <div class="container hero-container">
+            <div class="hero-text">
+                <h1>Все обзоры игр</h1>
+                <p>Честные разборы, объективные оценки и помощь в выборе.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="posts-wrapper">
+        <!-- БЛОК ПОИСКА -->
+        <div class="search-section">
+            <div class="search-container">
+                <form method="get" action="/posts" class="search-form">
+                    <input type="text"
+                           name="search"
+                           class="search-input"
+                           placeholder="🔍 Поиск по названию или описанию..."
+                           value="{{ search_query if search_query else '' }}">
+                    <button type="submit" class="search-btn">Найти</button>
+                </form>
+                {% if search_query %}
+                <div class="search-results-info">
+                    🔎 Найдено <strong>{{ articles|length }}</strong> результатов по запросу "{{ search_query }}"
+                    <a href="/posts" class="clear-search">✕ Очистить</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- БЛОК СОРТИРОВКИ -->
+        <div class="sort-bar">
+            <a href="/posts?sort=date{% if search_query %}&search={{ search_query }}{% endif %}"
+               class="sort-btn {% if sort_by == 'date' or not sort_by %}active{% endif %}">
+                📅 По дате (новые)
+            </a>
+            <a href="/posts?sort=score{% if search_query %}&search={{ search_query }}{% endif %}"
+               class="sort-btn {% if sort_by == 'score' %}active{% endif %}">
+                ⭐ По оценке (высокие)
+            </a>
+            <a href="/posts?sort=views{% if search_query %}&search={{ search_query }}{% endif %}"
+               class="sort-btn {% if sort_by == 'views' %}active{% endif %}">
+                👁️ По популярности
+            </a>
+        </div>
+
+        {% if articles|length > 0 %}
+        <div class="reviews-grid">
+            {% for el in articles %}
+            <article class="review-card">
+                <div class="card-image">
+                    {% if el.image %}
+                    <img src="{{ el.image }}" alt="{{ el.title }}">
+                    {% else %}
+                    <img src="https://placehold.co/600x400/1e1f2c/ff4d4d?text={{ el.title|replace(' ', '+') }}" alt="{{ el.title }}">
+                    {% endif %}
+                    {% if el.score %}
+                    <div class="score">{{ el.score }}/10</div>
+                    {% endif %}
+                </div>
+                <div class="card-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        {% if el.score %}
+                        <div class="review-score-badge">
+                            ⭐ {{ el.score }}/10
+                        </div>
+                        {% endif %}
+                        <div class="review-views">
+                            👁️ {{ el.views if el.views else 0 }}
+                        </div>
+                    </div>
+                    <h3><a href="/posts/{{ el.id }}">{{ el.title }}</a></h3>
+                    <div class="meta">
+                        📅 {{ el.date.date() if el.date else "Дата не указана" }}
+                        {% if el.score %}
+                        • ⭐ {{ el.score }}/10
+                        {% endif %}
+                        • 👁️ {{ el.views if el.views else 0 }} просмотров
+                    </div>
+                    <p>{{ el.intro[:120] }}{% if el.intro|length > 120 %}...{% endif %}</p>
+                    <div class="tags">
+                        {% if el.tags %}
+                            {% for tag in el.tags.split(',')[:3] %}
+                                <span>{{ tag.strip() }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span>Обзор</span>
+                            <span>Рекомендуем</span>
+                        {% endif %}
+                    </div>
+                    <a href="/posts/{{ el.id }}" class="read-more">Читать обзор →</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+            {% if search_query %}
+            <div class="no-results">
+                <h3>😕 Ничего не найдено</h3>
+                <p>По запросу "{{ search_query }}" ничего не найдено. Попробуйте изменить поисковый запрос.</p>
+                <a href="/posts">Посмотреть все обзоры</a>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h2>📭 Упс, статей на сайте пока что нет</h2>
+                <p>Будь первым — <a href="/create-article">создай первый обзор</a>!</p>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <a href="/">
+                        🎮 <span>GameReview</span>
+                    </a>
+                </div>
+                <p>Независимые обзоры видеоигр. Только факты, честные оценки и помощь в выборе.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/posts">Все обзоры</a></li>
+                    <li><a href="/create-article">Создать пост</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Информация</h4>
+                <ul>
+                    <li><a href="#">О проекте</a></li>
+                    <li><a href="#">Связаться с редакцией</a></li>
+                    <li><a href="#">Политика конфиденциальности</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Подписка</h4>
+                <p>Будьте в курсе новых обзоров</p>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Ваш email" required>
+                    <button type="submit">→</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 GameReview. Все права защищены. Все товарные знаки являются собственностью их владельцев.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

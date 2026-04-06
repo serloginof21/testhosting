@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавление статьи — GameReview</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/create.css') }}">
+    <style>
+        /* Стили для выбора оценки */
+        .score-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .score-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .score-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .score-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 10px 16px;
+            background: #1a1e2a;
+            border: 1px solid #2a2e3a;
+            border-radius: 40px;
+            color: #cbd5e6;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .score-option input:checked + .score-label {
+            background: #ff4d4d;
+            border-color: #ff4d4d;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .score-label:hover {
+            border-color: #ff4d4d;
+            transform: translateY(-2px);
+        }
+
+        .score-number {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .score-star {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    🎮 <span>GameReview</span>
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/posts">Все обзоры</a>
+                <a href="/create-article" class="active">Написать обзор</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="form-container">
+        <h1>➕ Добавление статьи</h1>
+        <form method="post" class="form-card">
+            <div class="form-group">
+                <label class="form-label" for="title">Название статьи</label>
+                <input type="text" name="title" id="title" class="form-control" placeholder="Введите название игры или статьи" required>
+                <div class="form-hint">Например: "Cyberpunk 2077: Стоит ли играть в 2025 году?"</div>
+            </div>
+
+            <!-- БЛОК ВЫБОРА ОЦЕНКИ -->
+            <div class="form-group">
+                <label class="form-label">⭐ Оценка игры (от 1 до 10)</label>
+                <div class="score-container">
+                    {% for i in range(1, 11) %}
+                    <label class="score-option">
+                        <input type="radio" name="score" value="{{ i }}" required>
+                        <span class="score-label">
+                            <span class="score-number">{{ i }}</span>
+                            <span class="score-star">/10</span>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="form-hint">Выберите оценку от 1 до 10</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="intro">Анонс (краткое описание)</label>
+                <textarea name="intro" id="intro" class="form-control" placeholder="Введите краткий анонс статьи" rows="4" required></textarea>
+                <div class="form-hint">Краткое описание, которое будет отображаться в карточке обзора</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="text">Основной текст статьи</label>
+                <textarea name="text" id="text" class="form-control" placeholder="Введите полный текст обзора" rows="12" required></textarea>
+                <div class="form-hint">Поддерживается HTML-разметка</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">📤 Опубликовать статью</button>
+                <a href="/posts" class="btn-cancel">❌ Отмена</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">🎮 <span>GameReview</span></div>
+                <p>Независимые обзоры видеоигр. Только факты, честные оценки и помощь в выборе.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/posts">Все обзоры</a></li>
+                    <li><a href="/create-article">Написать обзор</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Информация</h4>
+                <ul>
+                    <li><a href="#">Связаться с редакцией</a></li>
+                    <li><a href="#">Политика конфиденциальности</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Подписка</h4>
+                <p>Будьте в курсе новых обзоров</p>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Ваш email" required>
+                    <button type="submit">→</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 GameReview. Все права защищены.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

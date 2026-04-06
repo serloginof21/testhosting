@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ article.title }} — GameReview</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/article.css') }}">
+    <style>
+        /* Стили для двухколоночного макета */
+        .article-layout {
+            display: flex;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .article-main {
+            flex: 2;
+            min-width: 0;
+        }
+
+        .article-sidebar {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        /* Стили для популярных статей */
+        .popular-section {
+            background: #11141c;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #232734;
+            position: sticky;
+            top: 100px;
+        }
+
+        .popular-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ff4d4d;
+            display: inline-block;
+        }
+
+        .popular-list {
+            list-style: none;
+        }
+
+        .popular-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #232734;
+            transition: 0.2s;
+        }
+
+        .popular-item:hover {
+            transform: translateX(5px);
+        }
+
+        .popular-item a {
+            text-decoration: none;
+            color: #eef2ff;
+            font-weight: 500;
+            font-size: 15px;
+            line-height: 1.4;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .popular-item a:hover {
+            color: #ff4d4d;
+        }
+
+        .popular-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #7c7f8c;
+        }
+
+        .popular-views {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .popular-score {
+            background: #ff4d4d;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .article-score {
+            background: linear-gradient(135deg, #ff4d4d, #ff6b6b);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+        }
+
+        .article-views {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1a1e2a;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: #cbd5e6;
+        }
+
+        @media (max-width: 900px) {
+            .article-layout {
+                flex-direction: column;
+                padding: 24px 16px;
+            }
+
+            .article-sidebar {
+                order: -1;
+            }
+
+            .popular-section {
+                position: static;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    🎮 <span>GameReview</span>
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="/">Главная</a>
+                <a href="/posts">Все обзоры</a>
+                <a href="/create-article">Написать обзор</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="article-layout">
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <div class="article-main">
+            {% if article.image %}
+            <img src="{{ article.image }}" alt="{{ article.title }}" class="article-image">
+            {% endif %}
+
+            <div class="article-header">
+                {% if article.score %}
+                <div class="article-score">
+                    {{ article.score }}/10
+                    <div class="stars">
+                        {% for i in range(article.score // 2) %}★{% endfor %}
+                        {% for i in range(5 - (article.score // 2)) %}☆{% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <h1>{{ article.title }}</h1>
+
+                <div class="article-meta">
+                    <span>📅 {{ article.date.date() if article.date else "Дата не указана" }}</span>
+                    {% if article.score %}
+                    <span>⭐ Оценка: {{ article.score }}/10</span>
+                    {% endif %}
+                    <span class="article-views">
+                        👁️ {{ article.views if article.views else 0 }} просмотров
+                    </span>
+                </div>
+            </div>
+
+            <div class="article-content">
+                {{ article.text|safe }}
+            </div>
+
+            <div class="article-actions">
+                <a href="/posts" class="btn-back">← Назад к обзорам</a>
+                <a href="/posts/{{ article.id }}/update" class="btn-update">✏️ Редактировать</a>
+                <a href="/posts/{{ article.id }}/delete" class="btn-delete" onclick="return confirm('Вы уверены?')">🗑️ Удалить</a>
+            </div>
+        </div>
+
+        <!-- БОКОВАЯ ПАНЕЛЬ С ПОПУЛЯРНЫМИ СТАТЬЯМИ -->
+        <div class="article-sidebar">
+            <div class="popular-section">
+                <h3 class="popular-title">🔥 Популярные обзоры</h3>
+                {% if popular_articles %}
+                <ul class="popular-list">
+                    {% for popular in popular_articles %}
+                    <li class="popular-item">
+                        <a href="/posts/{{ popular.id }}">{{ popular.title }}</a>
+                        <div class="popular-meta">
+                            <span class="popular-views">
+                                👁️ {{ popular.views if popular.views else 0 }}
+                            </span>
+                            {% if popular.score %}
+                            <span class="popular-score">⭐ {{ popular.score }}/10</span>
+                            {% endif %}
+                            <span>📅 {{ popular.date.date() if popular.date else "" }}</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="color: #7c7f8c;">Пока нет популярных статей</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-logo">🎮 <span>GameReview</span></div>
+                <p>Независимые обзоры видеоигр. Только факты, честные оценки и помощь в выборе.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <ul>
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/posts">Все обзоры</a></li>
+                    <li><a href="/create-article">Написать обзор</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Информация</h4>
+                <ul>
+                    <li><a href="#">Связаться</a></li>
+                    <li><a href="#">Политика</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Подписка</h4>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Ваш email">
+                    <button type="submit">→</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 GameReview</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
