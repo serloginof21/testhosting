@@ -10,10 +10,10 @@ app = Flask(__name__)
 database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # Render использует 'postgres://', меняем на 'postgresql://'
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    # Добавляем параметр для SSL (нужно для Render)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url + '?sslmode=require'
     print("✅ Используется PostgreSQL (облачная БД)")
 else:
     # Для локальной разработки
@@ -125,8 +125,3 @@ def create_article():
             return "При добавлении статьи произошла ошибка!"
     else:
         return render_template("create-article.html")
-
-
-# ===== ЗАПУСК (только для локальной разработки) =====
-if __name__ == "__main__":
-    app.run(debug=True)
